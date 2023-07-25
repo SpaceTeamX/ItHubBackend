@@ -1,6 +1,9 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
+from .services import get_path_upload_user_avatar, validate_size_image
+
+
 # Create your models here.
 class CustomUserManager(BaseUserManager):
     def _create_user(self, username, email, password, **extra_fields):
@@ -29,6 +32,12 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    GENDERS = [
+        ('he', "Man"),
+        ("she", "Woman"),
+        ("none", "Anonymous"),
+    ]
+
     username = models.CharField(max_length=50)
     email = models.EmailField(max_length=50, unique=True)
 
@@ -36,11 +45,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=50, blank=True, null=True)
 
     age = models.IntegerField(blank=True, null=True)
-    country = models.CharField(max_length=50, blank=True, null=True)
-    city = models.CharField(max_length=50, blank=True, null=True)
-    avatar = models.ImageField(validators=[], blank=True, null=True)
+    location = models.CharField(max_length=100, blank=True, null=True)
+    avatar = models.ImageField(upload_to=get_path_upload_user_avatar,
+                               validators=[validate_size_image],
+                               blank=True,
+                               default="default/avatar.png")
 
     data_joined = models.DateTimeField(auto_now_add=True)
+    gender = models.CharField(max_length=4, choices=GENDERS, default="none")
 
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
