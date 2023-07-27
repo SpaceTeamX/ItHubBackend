@@ -20,7 +20,8 @@ from django.urls import path, include
 from ithub import settings
 
 urlpatterns = [
-    path("api/users/", include("users.urls"))
+    path("api/users/", include("users.urls")),
+    # path("api/resume/", include("resume.urls"))
 ]
 
 if settings.DEBUG:
