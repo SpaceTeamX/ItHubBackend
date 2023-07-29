@@ -55,7 +55,6 @@ INSTALLED_APPS = [
     "rest_framework",
     'knox',
     'users',
-    # "resume"
 ]
 
 MIDDLEWARE = [
@@ -157,5 +156,5 @@ REST_FRAMEWORK = {
 
 RES_KNOX = {
     "USER_SERIALIZER": "users.serializers.UserSerializer",
-    "TOKEN_TTL": timedelta(hours=15)
+    "TOKEN_TTL": timedelta(hours=5)
 }
