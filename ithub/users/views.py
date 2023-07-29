@@ -1,9 +1,8 @@
 from knox.models import AuthToken
-from rest_framework import generics, status
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .models import User
 from .serializers import *
 
 
@@ -15,9 +14,10 @@ class LoginAPIView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
         return Response({
-            "user": MeUserSerializer(user, context=self.get_serializer_context()).data,
+            "user": UserSerializer(user, context=self.get_serializer_context()).data,
             "token": AuthToken.objects.create(user)[1]
         })
+
 
 class RegistrationAPIView(generics.GenericAPIView):
     serializer_class = CreateUserSerializer
@@ -28,56 +28,69 @@ class RegistrationAPIView(generics.GenericAPIView):
         user = serializer.save()
 
         return Response({
-            "user": MeUserSerializer(user, context=self.get_serializer_context()).data,
+            "user": UserSerializer(user, context=self.get_serializer_context()).data,
             "token": AuthToken.objects.create(user)[1]
         })
 
 
-class AnotherProfileAPIView(generics.GenericAPIView):
-    serializer_class = AnotherUserSerializer
+class AnotherProfileAPIView(generics.RetrieveAPIView):
+    serializer_class = AnotherProfileSerializer
+    queryset = Profile.objects.all()
 
-    def get(self, request, user_id, *args, **kwargs):
+    def get_object(self):
+        user_id = self.kwargs["user_id"]
         try:
             user = User.objects.get(id=user_id)
         except:
-            return Response(
-                {"error": "User not found"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            raise ValidationError({"error": "User not found"})
 
-        return Response(AnotherUserSerializer(user, context=self.get_serializer_context()).data)
+        profile = Profile.objects.get(user=user)
+        return profile
 
 
-class MeProfileAPIView(generics.GenericAPIView):
-    permission_classes = (IsAuthenticated, )
-    serializer_class = MeUserSerializer
+class MeProfileAPIView(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = MeProfileSerializer
+    queryset = Profile.objects.all()
 
-    def get(self, request, *args, **kwargs):
-        return Response(MeUserSerializer(self.request.user, context=self.get_serializer_context()).data)
-
-    def put(self, request, *args, **kwargs):
+    def get_object(self):
         user = self.request.user
 
-        serializer = MeUserSerializer(user, data=request.data, partial=True, context=self.get_serializer_context())
+        profile = Profile.objects.get(user=user)
+        return profile
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    def update(self, request, *args, **kwargs):
+        kwargs["partial"] = True
+        return super(MeProfileAPIView, self).update(request, *args, **kwargs)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, *args, **kwargs):
-        serializer = DeleteUserSerializer(instance=self.request.user, data=request.data, context=self.get_serializer_context())
+class AccountAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        kwargs["partial"] = True
+        return super(AccountAPIView, self).update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        serializer = DeleteUserSerializer(
+            instance=self.get_object(),
+            data=request.data,
+            context=self.get_serializer_context()
+        )
         serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data)
 
 
 class PasswordResetAPIView(generics.GenericAPIView):
     serializer_class = PasswordResetSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         user = self.request.user
-        serializer = PasswordResetSerializer(data=request.data, instance=user, context=self.get_serializer_context())
+        serializer = self.get_serializer(data=request.data, instance=user, context=self.get_serializer_context())
         serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data)
