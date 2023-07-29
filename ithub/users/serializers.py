@@ -2,6 +2,7 @@ from os import remove
 from shutil import rmtree
 
 from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
 from ithub.settings import MEDIA_ROOT
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -71,13 +72,17 @@ class CreateUserSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
+    def validate(self, attrs):
+        validate_password(attrs['password'])
+        return super(CreateUserSerializer, self).validate(attrs)
+
     def create(self, validated_data: dict):
         user = User.objects.create_user(
             validated_data['username'],
             validated_data["email"],
             validated_data['password']
         )
-        # Profile.objects.create(user=user)
+
         return user
 
 
@@ -127,6 +132,8 @@ class PasswordResetSerializer(serializers.Serializer):
         if new_password != new_password_repeat or instance.check_password(new_password):
             raise ValidationError("The new password does not match the recurrence, or the new password is the same as "
                                   "the old one")
+
+        validate_password(new_password, self.instance)
 
         instance.set_password(new_password)
         instance.save()

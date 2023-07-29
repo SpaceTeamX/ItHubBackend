@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.password_validation import validate_password
 from django.db import models
 
 from .services import get_path_upload_user_avatar, validate_size_image
