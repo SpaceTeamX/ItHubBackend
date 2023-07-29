@@ -2,10 +2,10 @@ from os import remove
 from shutil import rmtree
 
 from django.contrib.auth import authenticate
-from drf_writable_nested import WritableNestedModelSerializer
 from ithub.settings import MEDIA_ROOT
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from drf_writable_nested import WritableNestedModelSerializer
 
 from .models import User, Profile
 
