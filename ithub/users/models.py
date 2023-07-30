@@ -43,6 +43,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
+    @property
+    def is_staff(self):
+        return self.is_superuser
+
 
 class Profile(models.Model):
     GENDERS = [
@@ -61,4 +65,7 @@ class Profile(models.Model):
                                default="default/avatar.png")
 
     gender = models.CharField(max_length=4, choices=GENDERS, default="none")
+
+    def __str__(self):
+        return self.user.username
 
