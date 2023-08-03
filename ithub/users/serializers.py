@@ -38,7 +38,7 @@ class MeProfileSerializer(WritableNestedModelSerializer, serializers.ModelSerial
                 except Exception as ex:
                     print(ex)
 
-        return super(MeProfileSerializer, self).update(instance, validated_data)
+        return super().update(instance, validated_data)
 
     class Meta:
         model = Profile
@@ -74,7 +74,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         validate_password(attrs['password'])
-        return super(CreateUserSerializer, self).validate(attrs)
+        return super().validate(attrs)
 
     def create(self, validated_data: dict):
         user = User.objects.create_user(
@@ -103,11 +103,10 @@ class DeleteUserSerializer(serializers.Serializer):
         if not instance.check_password(password):
             raise ValidationError("password incorrectly")
 
-        if instance.user.avatar.url != "/media/default/avatar.png":
-            try:
-                rmtree(MEDIA_ROOT / "users" / str(instance.id))
-            except Exception as ex:
-                print(ex)
+        try:
+            rmtree(MEDIA_ROOT / "users" / str(instance.id))
+        except Exception as ex:
+            print(ex)
 
         instance.delete()
 
