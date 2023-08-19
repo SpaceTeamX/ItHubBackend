@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     "rest_framework",
     'knox',
     'users',
-    "vacancy"
+    "vacancy",
+    'forum.apps.ForumConfig'
 ]
 
 MIDDLEWARE = [
