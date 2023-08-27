@@ -23,7 +23,24 @@ class VacancyViewSet(viewsets.ModelViewSet):
             raise ValidationError("Vacancy not found")
 
     def get_queryset(self):
-        return Vacancy.objects.all()[:10]
+        params = self.request.query_params
+        vacancies = Vacancy.objects.all()
+
+        page = params.get("page")
+
+        if page:
+            page = int(page)
+            vacancies = vacancies[page*10:10*(page+1)]
+        else:
+            title = params.get("title", "")
+            description = params.get("description", "")
+            profit = params.get("profit", "")
+
+            vacancies = vacancies.filter(
+                title__icontains=title, description__icontains=description, profit__icontains=profit
+            )
+
+        return vacancies
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
