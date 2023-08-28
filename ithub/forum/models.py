@@ -19,3 +19,16 @@ class Question(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='comments')
+    username = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_name')
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_date']
+
+    def __str__(self):
+        return self.text
