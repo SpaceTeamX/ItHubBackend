@@ -168,3 +168,5 @@ RES_KNOX = {
     "USER_SERIALIZER": "users.serializers.UserSerializer",
     "TOKEN_TTL": timedelta(hours=5)
 }
+
+APPEND_SLASH = True
