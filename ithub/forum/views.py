@@ -1,9 +1,35 @@
 from rest_framework import viewsets, status, permissions, generics
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from taggit.models import Tag
+from rest_framework import pagination
+
 
 from .models import Category, Question, Comment
-from .serializers import CategorySerializer, QuestionSerializer, CommentSerializer
+from .serializers import CategorySerializer, QuestionSerializer, CommentSerializer, TagSerializer
+
+
+class TagView(generics.ListAPIView):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class PageNumberSetPagination(pagination.PageNumberPagination):
+    page_size = 6
+    page_size_query_param = 'page_size'
+    ordering = 'created_at'
+
+
+class TagDetailView(generics.ListAPIView):
+    serializer_class = QuestionSerializer
+    pagination_class = PageNumberSetPagination
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        tag_slug = self.kwargs['tag_slug'].lower()
+        tag = Tag.objects.get(slug=tag_slug)
+        return Question.objects.filter(tags=tag)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -15,7 +41,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
+    lookup_field = 'slug'
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    pagination_class = PageNumberSetPagination
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -39,5 +67,5 @@ class CommentView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         post_slug = self.kwargs['post_slug'].lower()
-        post = Question.objects.get(slug=post_slug)
+        post = Post.objects.get(slug=post_slug)
         return Comment.objects.filter(post=post)

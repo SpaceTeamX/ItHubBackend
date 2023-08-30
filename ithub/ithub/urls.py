@@ -2,7 +2,7 @@
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
-from forum.views import QuestionViewSet
+from forum.views import QuestionViewSet, TagDetailView, TagView, CommentView
 from rest_framework import routers
 
 from ithub import settings
@@ -17,6 +17,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/users/", include("users.urls")),
     path("api/", include(router.urls)),
+    path("tags/", TagView.as_view()),
+    path("tags/<slug:tag_slug>/", TagDetailView.as_view()),
+    path("comments/", CommentView.as_view()),
+    path("comments/<slug:post_slug>/", CommentView.as_view()),
 ]
 
 if settings.DEBUG:
