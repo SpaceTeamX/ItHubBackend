@@ -20,7 +20,7 @@ urlpatterns = [
     path("tags/", TagView.as_view()),
     path("tags/<slug:tag_slug>/", TagDetailView.as_view()),
     path("comments/", CommentView.as_view()),
-    path("comments/<slug:post_slug>/", CommentView.as_view()),
+    path("comments/<post_slug>/", CommentView.as_view()),
     path("ckeditor/", include('ckeditor_uploader.urls')),
 ]
 

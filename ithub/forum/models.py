@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 from taggit.managers import TaggableManager
 from users.models import User
 from ckeditor_uploader.fields import RichTextUploadingField
@@ -23,6 +24,10 @@ class Question(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)
+        super(Question, self).save(*args, **kwargs)
 
 
 class Comment(models.Model):

@@ -27,10 +27,9 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class QuestionSerializer(TaggitSerializer, serializers.ModelSerializer):
 
-    tags = TagListSerializerField()
+    tags = TagSerializer(many=True, read_only=True)
     author = serializers.SlugRelatedField(slug_field="username",
                                           queryset=User.objects.all())
-
 
     class Meta:
         model = Question
@@ -44,8 +43,8 @@ class QuestionSerializer(TaggitSerializer, serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
 
     username = serializers.SlugRelatedField(slug_field="username", queryset=User.objects.all())
-    text = serializers.SlugRelatedField(slug_field="slug", queryset=Question.objects.all())
+    question = serializers.SlugRelatedField(slug_field="slug", queryset=Question.objects.all())
 
     class Meta:
         model = Comment
-        fields = ("id", "content", "username", "text", "created_date")
+        fields = '__all__'
