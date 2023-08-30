@@ -14,11 +14,11 @@ class Category(models.Model):
 
 class Question(models.Model):
     title = models.CharField(max_length=200)
+    slug = models.SlugField()
     categories = models.ManyToManyField(Category)
-    content = models.TextField()
+    content = RichTextUploadingField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    slug = models.SlugField()
     tags = TaggableManager()
 
     def __str__(self):
@@ -26,7 +26,7 @@ class Question(models.Model):
 
 
 class Comment(models.Model):
-    content = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='comments')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='comments')
     username = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_name')
     text = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)

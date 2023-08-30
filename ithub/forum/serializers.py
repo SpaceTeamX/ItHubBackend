@@ -49,7 +49,3 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ("id", "content", "username", "text", "created_date")
-        lookup_field = 'id'
-        extra_kwargs = {
-            'url': {'lookup_field': 'id'}
-        }

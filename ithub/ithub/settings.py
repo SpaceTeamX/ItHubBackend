@@ -54,14 +54,15 @@ INSTALLED_APPS = [
 
 
     "rest_framework",
-    'taggit',
-    'taggit_serializer',
+
     'knox',
     'users',
     "vacancy",
+    'forum.apps.ForumConfig',
+    'taggit',
+    'taggit_serializer',
     'ckeditor',
     'ckeditor_uploader',
-    'forum.apps.ForumConfig'
 ]
 
 MIDDLEWARE = [
